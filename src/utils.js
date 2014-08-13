@@ -1,9 +1,9 @@
 'use strict';
 
-export { uniq, transpose, partition, flatMap, freqs, entropy, createRows };
+export { uniq, transpose, partition, freqs, entropy, pack, unpack, max };
 
 const uniq = (arr) =>
-  arr.reduce((acc, val) => acc.indexOf(val) < 0 ? acc.concat(val) : acc, []);
+  arr.reduce((acc, val) => acc.indexOf(val) < 0 ? [...acc, val] : acc, []);
 
 const transpose = (matrix) =>
   matrix[0].map((_, i) => matrix.map(row => row[i]));
@@ -11,12 +11,10 @@ const transpose = (matrix) =>
 const partition = (fn, arr) =>
   arr.reduce((acc, item) => {
     let key = fn(item);
-    acc[key] = (acc[key] || []).concat(item);
+    if (!acc[key]) acc[key] = [];
+    acc[key] = [...acc[key], item];
     return acc;
   }, {});
-
-const flatMap = (fn, arr) =>
-  arr.map(fn).reduce((acc, val) => acc.concat(val), []);
 
 const freqs = (arr) =>
   arr.reduce((acc, item) => {
@@ -30,9 +28,11 @@ const entropy = (arr) => {
   return probs.reduce((e, p) => e - p * Math.log(p), 0) * Math.LOG2E;
 };
 
-const createRows = (X, Y) => {
-  let rows = X.map((x, i) => { return { features: x, label: Y[i] }; });
-  [rows.features, rows.labels]  = [X, Y];
-  return rows;
-};
+const pack = (X, Y) =>
+  X.map((x, i) => [x, Y[i]]);
 
+const unpack = (packed) =>
+  packed.reduce(([X, Y], [x, y]) => [[...X, x], [...Y, y]], [[], []]);
+
+const max = ([first, ...rest]) =>
+  rest.reduce((max, next) => next > max ? next : max, first);

@@ -1,90 +1,88 @@
 'use strict';
 
-import { uniq, entropy, freqs, transpose, partition } from './utils';
+import {
+  uniq,
+  entropy,
+  freqs,
+  transpose,
+  partition,
+  pack,
+  unpack
+} from './utils';
 
 export {
-  predict, 
-  create, 
-  informationGain, 
-  probabilities, 
+  predict,
+  create,
+  informationGain,
+  probabilities,
   getRowsFeatures,
   findBestPartitions
 };
 
 const predict = (tree, x) => {
   if (tree.trees) {
-    let fn = (row) => row[tree.index] >= tree.value;
-    let next = tree.trees[fn(x)];
-    return predict(next, x);
+    let key = x[tree.index] >= tree.value;
+    return predict(tree.trees[key]);
   } else {
-    return tree.probabilities;
+    return tree.probs
   }
 };
 
 const informationGain = (score, partitions) => {
   let arr = Object.keys(partitions).map(k => partitions[k]);
-  let total = arr.reduce((len, part) => len + part.length, 0);
+  let total = arr.reduce((len, partition) => len + partition.length, 0);
 
-  return arr.reduce((gain, rows) => {
-    return gain - (rows.length / total) * entropy(rows);
+  return arr.reduce((gain, partition) => {
+    let [_, Y] = unpack(partition); // jshint ignore:line
+    return gain - (partition.length / total) * entropy(Y);
   }, score);
 };
 
-const probabilities = (rows, labels) => {
-  let fs = freqs(rows.labels);
-  return labels.map(label => (label in fs) ? fs[label] / rows.length : 0.0);
+const probabilities = (Y, labels) => {
+  let fs = freqs(Y);
+  return labels.map(label => fs[label] ? fs[label] / Y.length : 0.0);
 };
 
-const getRowsFeatures = (rows) =>
-  transpose(rows.features);
-
-const create = (rows, labels) => {
+const create = (X, Y, labels) => {
   // calculate initial score for rows
-  let score = entropy(rows);
-  let results = {
-    probabilities: probabilities(rows, labels)
-  };
+  let score = entropy(Y);
+  let probs = probabilities(Y, labels);
+  let results = { probs };
 
   if (score > 0.25) {
-    let best = findBestPartitions(score, rows);
-    best.trees = Object.keys(best.partitions).reduce((acc, key) => {
-      acc[key] = create(best.partitions[key], labels);
-      return acc;
-    }, {});
-    results.gain = best.gain;
-    results.trees = best.trees;
-    results.index = best.index;
-    results.value = best.value;
+    let { gain, partitions, index, value } = findBestPartitions(score, X, Y);
+
+    let trees = Object.keys(partitions)
+      .reduce((acc, key) => {
+        let [X, Y] = unpack(partitions[key]);
+        acc[key] = create(X, Y, labels);
+        return acc;
+      }, {});
+
+    results = { probs, gain, trees, index, value }; // jshint ignore:line
   }
 
   return results;
 };
 
-const findBestPartitions = (score, rows) => {
-  let rowsFeatures = getRowsFeatures(rows);
+const findBestPartitions = (score, X, Y) => {
   // create list of features and values for each feature and each feature value
-  let values = rowsFeatures
-    .map((row, i) => uniq(row).map(val => [i, val]))
+  let features = transpose(X)
+    .map((row, index) => uniq(row).map(val => [index, val]))
     .reduce((acc, val) => acc.concat(val), []);
 
-  // apply partition fns to rows and find the fn with the most infoGain
-  return values.reduce((acc, value) => {
-    let fn = (row) => row.features[value.index] >= value.val;
-    let partitions = partition(fn, rows);
+  // apply partition fns to rows and find the feature/val with the most infoGain
+  return features.reduce((acc, [index, value]) => {
+    let fn = ([x, y]) => x[index] >= value;
+    let partitions = partition(fn, pack(X, Y));
     let gain = informationGain(score, partitions);
 
     if (!acc.gain || gain > acc.gain) {
-      acc = {
-        gain: gain,
-        partitions: partitions,
-        index: value.index,
-        value: value.val
-      };
+      acc = { gain, partitions, index, value }; // jshint ignore:line
     }
 
     return acc;
   }, {});
 };
-
 
 

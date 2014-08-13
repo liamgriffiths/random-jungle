@@ -28,13 +28,6 @@ describe('Utils', function() {
     assert.deepEqual(whereEven[false], [1, 3, 5, 7]);
   });
 
-  it('can flatMap an array of arrays', function() {
-    var flatMap = utils.flatMap;
-    var a = [[0, 1, 2], [3, 4], [5]];
-    var id = function(x) { return x; };
-    assert.deepEqual(flatMap(id, a), [0, 1, 2, 3, 4, 5]);
-  });
-
   it('can return the frequencies of items in an array', function() {
     var freqs = utils.freqs;
     assert.deepEqual(freqs(['a', 'b', 'b', 'c', 'c', 'c']), {a: 1, b: 2, c: 3});
@@ -49,21 +42,5 @@ describe('Utils', function() {
     assert.equal(0, entropy([]));
     assert.equal(0, entropy([1]));
     assert.equal(1, entropy([1, 0]));
-  });
-
-  it('can create rows from arrays of data', function() {
-    var createRows = utils.createRows;
-    var X = [[1, 2, 3, 4], [5, 6, 7, 8]];
-    var Y = ['a', 'b'];
-
-    var rows = [
-      { features: [1, 2, 3, 4], label: 'a' },
-      { features: [5, 6, 7, 8], label: 'b' }
-    ];
-
-    assert.deepEqual(rows[0], createRows(X, Y)[0]);
-    assert.deepEqual(rows[1], createRows(X, Y)[1]);
-    assert.deepEqual(X, createRows(X, Y).features);
-    assert.deepEqual(Y, createRows(X, Y).labels);
   });
 });
