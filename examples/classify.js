@@ -21,18 +21,18 @@ const labels = uniq(data.map(([x, y]) => y));
 // partition into test && training sets
 var sets = partition(() => Math.random() > 0.25, data);
 var [trainX, trainY] = unpack(sets[true]);
-var [testX, testY] = unpack(sets[false]);
-
+var testSet = sets[false];
 
 var tree = CART.create(trainX, trainY, labels);
-// console.log(JSON.stringify(tree));
+console.log(JSON.stringify(tree));
 
-var correct = 0;
-testX.map((x, i) => {
-  console.log(x, testY[i]);
+var [correct, incorrect] = [0, 0];
+testSet.forEach(function([x, y]) {
   let out = CART.predict(tree, x);
-  let ok = labels.indexOf(testY[i]) === labels.indexOf(max(out));
-  if (ok) correct++;
+  if (labels.indexOf(y) === out.indexOf(max(out))) {
+    correct++;
+  } else {      
+    incorrect++;
+  }
 });
-
-console.log(correct / testX.length);
+console.log(correct, incorrect);

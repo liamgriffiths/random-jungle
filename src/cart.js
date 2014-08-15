@@ -22,7 +22,7 @@ export {
 const predict = (tree, x) => {
   if (tree.trees) {
     let key = x[tree.index] >= tree.value;
-    return predict(tree.trees[key]);
+    return predict(tree.trees[key], x);
   } else {
     return tree.probs
   }
@@ -52,12 +52,11 @@ const create = (X, Y, labels) => {
   if (score > 0.25) {
     let { gain, partitions, index, value } = findBestPartitions(score, X, Y);
 
-    let trees = Object.keys(partitions)
-      .reduce((acc, key) => {
-        let [X, Y] = unpack(partitions[key]);
-        acc[key] = create(X, Y, labels);
-        return acc;
-      }, {});
+    let trees = Object.keys(partitions).reduce((acc, key) => {
+      let [X, Y] = unpack(partitions[key]);
+      acc[key] = create(X, Y, labels);
+      return acc;
+    }, {});
 
     results = { probs, gain, trees, index, value }; // jshint ignore:line
   }
