@@ -1,6 +1,7 @@
 'use strict';
 
 var assert = require('assert');
+var sinon = require('sinon');
 var utils = require('..').utils;
 
 describe('Utils', function() {
@@ -42,5 +43,25 @@ describe('Utils', function() {
     assert.equal(0, entropy([]));
     assert.equal(0, entropy([1]));
     assert.equal(1, entropy([1, 0]));
+  });
+
+  it('can flatten an array', function() {
+    var flatten = utils.flatten;
+    assert.deepEqual([], flatten([]));
+    assert.deepEqual([1], flatten([1]));
+    assert.deepEqual([], flatten([[]]));
+    assert.deepEqual([1,2,3,4], flatten([[1], 2, [3, 4], []]));
+  });
+
+  it('can flatMap an array', function() {
+    var flatMap = utils.flatMap;
+    var arr = [1,[2], [3, 4], []];
+    var spy = sinon.spy(function(n) { return n; });
+    assert.deepEqual([1,2,3,4], flatMap(arr, spy));
+    assert.equal(spy.callCount, 4);
+    assert(spy.getCall(0).calledWith(1));
+    assert(spy.getCall(1).calledWith([2]));
+    assert(spy.getCall(2).calledWith([3,4]));
+    assert(spy.getCall(3).calledWith([]));
   });
 });

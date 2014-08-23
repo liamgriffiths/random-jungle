@@ -1,6 +1,9 @@
 'use strict';
 
-export { uniq, transpose, partition, freqs, entropy, pack, unpack, max };
+export { 
+  uniq, transpose, partition, freqs, entropy, pack, unpack, max, flatten, 
+  flatMap 
+};
 
 const uniq = (arr) =>
   arr.reduce((acc, val) => acc.indexOf(val) < 0 ? [...acc, val] : acc, []);
@@ -27,6 +30,12 @@ const entropy = (arr) => {
   let probs = Object.keys(f).map(k => f[k] / arr.length);
   return probs.reduce((e, p) => e - p * Math.log(p), 0) * Math.LOG2E;
 };
+
+const flatten = (arr) =>
+  arr.reduce((acc, val) => acc.concat(val), []);
+
+const flatMap = (arr, fn) =>
+  flatten(arr.map(fn));
 
 const pack = (X, Y) =>
   X.map((x, i) => [x, Y[i]]);
