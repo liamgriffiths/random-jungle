@@ -2,7 +2,7 @@
 
 export { 
   uniq, transpose, partition, freqs, entropy, pack, unpack, max, flatten, 
-  flatMap 
+  flatMap, values, perc
 };
 
 const uniq = (arr) =>
@@ -25,9 +25,12 @@ const freqs = (arr) =>
     return acc;
   }, {});
 
+const perc = (val, arr) =>
+  arr.filter(item => item === val).length / arr.length || 0.0;
+
 const entropy = (arr) => {
   let f = freqs(arr);
-  let probs = Object.keys(f).map(k => f[k] / arr.length);
+  let probs = values(f).map(n => n / arr.length);
   return probs.reduce((e, p) => e - p * Math.log(p), 0) * Math.LOG2E;
 };
 
@@ -46,4 +49,6 @@ const unpack = (packed) =>
 const max = ([first, ...rest]) =>
   rest.reduce((max, next) => next > max ? next : max, first);
 
+const values = (obj) =>
+  Object.keys(obj).map((k, i, keys) => obj[k]);
 
