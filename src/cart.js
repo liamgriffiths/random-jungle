@@ -1,7 +1,8 @@
 'use strict';
 
 import {
-  uniq, entropy, perc, transpose, partition, pack, unpack, flatMap, values, map
+  uniq, entropy, perc, transpose, partition, pack, unpack, flatMap, values, map,
+  flatten
 } from './utils';
 
 export { create, predict };
@@ -35,7 +36,7 @@ const predict = (tree, x) =>
 // in a set of partitions than in the combined set.
 const informationGain = (score, partitions) => {
   let parts = values(partitions);
-  let len = parts.reduce((sum, part) => sum + part.length, 0);
+  let len = flatten(parts).length;
   return parts.reduce((g, [X, Y]) => g - (Y.length / len) * entropy(Y), score);
 };
 
@@ -59,8 +60,7 @@ const getFeaturesToSplitOn = (X) =>
 const getBestSplit = (score, X, Y) =>
   getFeaturesToSplitOn(X).reduce((best, {value, index}) => {
     let fn = ([x, y]) => x[index] >= value;
-    let partitions = map(partition(fn, pack(X, Y)), (part) => unpack(part));
-
+    let partitions = map(partition(fn, pack(X, Y)), part => unpack(part));
     let gain = informationGain(score, partitions);
 
     if (!best.gain || gain > best.gain)
