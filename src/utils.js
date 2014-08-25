@@ -46,8 +46,8 @@ const pack = (X, Y) =>
 const unpack = (packed) =>
   packed.reduce(([X, Y], [x, y]) => [[...X, x], [...Y, y]], [[], []]);
 
-const max = ([first, ...rest]) =>
-  rest.reduce((max, next) => next > max ? next : max, first);
+const max = (arr) =>
+  Math.max(...arr);
 
 const values = (obj) =>
   Object.keys(obj).map((k, i, keys) => obj[k]);
