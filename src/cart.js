@@ -9,54 +9,47 @@ export { create, predict };
 
 const {assign} = Object;
 
-// Create a decision tree by recursively splitting on the feature/value of each
+// Create a decision tree by recursively splitting on the feature value of each
 // set of examples which results in the most information gain.
 const create = (X, Y, labels) => {
   let score = entropy(Y);
   let probs = probabilities(Y, labels);
   let results = { probs };
 
-  if (score > 0.25) {
-    let { gain, partitions, index, value, fn } = getBestSplit(score, X, Y);
-    let trees = map(partitions, ([X, Y]) => create(X, Y, labels));
-    assign(results, { gain, trees, index, value, fn });
+  if (score > 0) {
+    let {gain, partitions, index, value, fn} = getBestSplit(score, X, Y);
+    let trees = map(partitions, ([x, y]) => create(x, y, labels));
+    assign(results, {gain, trees, index, value, fn});
   }
 
   return results;
 };
 
-// Traverse the tree and when there are no more sub-trees return the
-// probabilities for all the possible categories.
+// Traverse the tree and finally return the probabilities for an example.
 const predict = (tree, x) =>
   tree.trees ? predict(tree.trees[tree.fn([x])], x) : tree.probs;
 
-// Given a previous score (entropy) and a set of partitions, calculate the
-// weighted entropy of each partition and find the difference from the previous
-// score. The "information gain" represents the how much less entropy there is
-// in a set of partitions than in the combined set.
+// Return the difference between the score (previous entropy) and the sum of the
+// weighted entropy of a set of partitions.
 const informationGain = (score, partitions) => {
   let parts = values(partitions);
   let len = flatten(parts).length;
   return parts.reduce((g, [X, Y]) => g - (Y.length / len) * entropy(Y), score);
 };
 
-// Given an list of outcomes (Y) and list of possible outcomes (labels) return
-// a list of the probability for each possible outcome
+// Return an array of probabilities for each label.
 const probabilities = (Y, labels) =>
   labels.map(label => perc(label, Y));
 
-// Create a list of features and values for each feature and each feature value
-// for example:
-// [[1, 2], [1, 3]] ->
-// [{index: 0, value: 1}, {index: 1, value: 2}, {index: 1: value: 3}]
+// For a feature matrix, return an array of unique feature values for each col.
+// For example: [[1], [1]] -> [{ index: 0, value: 1 }]
 const getFeaturesToSplitOn = (X) =>
   flatMap(transpose(X), (row, index) => {
-    return uniq(row).map(value => { return { value, index }; });
+    return uniq(row).map(value => { return {value, index}; });
   });
 
-// For every feature value to split on, split the data on that value and
-// compare to the previous entropy score for the split data. Return the values
-// that created the split with the greated "information gain".
+// Find the best partition by trying all possible partitions and keeping track
+// of the one with the greated 'information gain' (less entropy post-partition).
 const getBestSplit = (score, X, Y) =>
   getFeaturesToSplitOn(X).reduce((best, {value, index}) => {
     let fn = ([x, y]) => x[index] >= value;
@@ -64,7 +57,7 @@ const getBestSplit = (score, X, Y) =>
     let gain = informationGain(score, partitions);
 
     if (!best.gain || gain > best.gain)
-      assign(best, { gain, partitions, index, value, fn });
+      assign(best, {gain, partitions, index, value, fn});
 
     return best;
   }, {});
