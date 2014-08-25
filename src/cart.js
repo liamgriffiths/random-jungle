@@ -7,27 +7,23 @@ import {
 
 export { create, predict };
 
-const {assign} = Object;
-
 // Create a decision tree by recursively splitting on the feature value of each
 // set of examples which results in the most information gain.
 const create = (X, Y, labels) => {
   let score = entropy(Y);
-  let probs = probabilities(Y, labels);
-  let results = { probs };
 
   if (score > 0) {
-    let {gain, partitions, i, value, fn} = getBestSplit(score, X, Y);
+    let {gain, partitions, value, i, fn} = getBestSplit(score, X, Y);
     let trees = map(partitions, ([x, y]) => create(x, y, labels));
-    assign(results, { gain, trees, i, value, fn });
+    return { score, trees, fn };
+  } else {
+    return { probs: probabilities(Y, labels) };
   }
-
-  return results;
 };
 
-// Traverse the tree and finally return the probabilities for an example.
+// Traverse the tree until we are at a leaf (has probabilities).
 const predict = (tree, x) =>
-  tree.trees ? predict(tree.trees[tree.fn([x])], x) : tree.probs;
+  tree.probs || predict(tree.trees[tree.fn([x])], x);
 
 // Return the difference between the score (previous entropy) and the sum of the
 // weighted entropy of a set of partitions.
@@ -51,7 +47,7 @@ const getBestSplit = (score, X, Y) =>
     let gain = informationGain(score, Y.length, ...values(partitions));
 
     if (!best.gain || gain > best.gain)
-      assign(best, { gain, partitions, i, value, fn });
+      Object.assign(best, { gain, partitions, value, i, fn });
 
     return best;
   }, {});

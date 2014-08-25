@@ -34,4 +34,4 @@ testSet.forEach(function([x, y]) {
     incorrect++;
   }
 });
-console.log(correct, incorrect);
+console.log(correct / (correct  + incorrect));

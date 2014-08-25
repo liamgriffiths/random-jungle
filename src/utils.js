@@ -29,8 +29,7 @@ const perc = (val, arr) =>
   arr.filter(item => item === val).length / arr.length;
 
 const entropy = (arr) => {
-  let f = freqs(arr);
-  let probs = values(f).map(n => n / arr.length);
+  let probs = values(freqs(arr)).map(n => n / arr.length);
   return probs.reduce((e, p) => e - p * Math.log(p), 0) * Math.LOG2E;
 };
 
@@ -50,7 +49,7 @@ const max = (arr) =>
   Math.max(...arr);
 
 const values = (obj) =>
-  Object.keys(obj).map((k, i, keys) => obj[k]);
+  Object.keys(obj).map(key => obj[key]);
 
 const map = (obj, fn) =>
   Object.keys(obj).reduce((acc, key) => {
