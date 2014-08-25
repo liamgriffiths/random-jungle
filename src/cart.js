@@ -1,30 +1,30 @@
 'use strict';
 
-import { uniq, entropy, perc, transpose, partition, pack, unpack, flatMap, values } from './utils'; // jshint ignore:line
-export { predict, create, informationGain, probabilities, getBestSplit }; // jshint ignore:line
+import {
+  uniq, entropy, perc, transpose, partition, pack, unpack, flatMap, values, map
+} from './utils';
+
+export { create, predict };
+
+const {assign} = Object;
 
 // Create a decision tree by recursively splitting on the feature/value of each
 // set of examples which results in the most information gain.
-const create = (X, Y, labels, options) => {
+const create = (X, Y, labels) => {
   let score = entropy(Y);
   let probs = probabilities(Y, labels);
+  let results = { probs };
 
-  if (score > (100/labels.length)/100) {
+  if (score > 0.25) {
     let { gain, partitions, index, value, fn } = getBestSplit(score, X, Y);
-
-    let trees = Object.keys(partitions).reduce((acc, key) => {
-      let [X, Y] = unpack(partitions[key]);
-      acc[key] = create(X, Y, labels);
-      return acc;
-    }, {});
-
-    return { probs, gain, trees, index, value, fn }; // jshint ignore:line
-  } else {
-    return { probs };
+    let trees = map(partitions, ([X, Y]) => create(X, Y, labels));
+    assign(results, { gain, trees, index, value, fn });
   }
+
+  return results;
 };
 
-// Traverse the tree and when there are no more sub-trees return the 
+// Traverse the tree and when there are no more sub-trees return the
 // probabilities for all the possible categories.
 const predict = (tree, x) =>
   tree.trees ? predict(tree.trees[tree.fn([x])], x) : tree.probs;
@@ -34,7 +34,7 @@ const predict = (tree, x) =>
 // score. The "information gain" represents the how much less entropy there is
 // in a set of partitions than in the combined set.
 const informationGain = (score, partitions) => {
-  let parts = values(partitions).map(part => unpack(part));
+  let parts = values(partitions);
   let len = parts.reduce((sum, part) => sum + part.length, 0);
   return parts.reduce((g, [X, Y]) => g - (Y.length / len) * entropy(Y), score);
 };
@@ -57,16 +57,16 @@ const getFeaturesToSplitOn = (X) =>
 // compare to the previous entropy score for the split data. Return the values
 // that created the split with the greated "information gain".
 const getBestSplit = (score, X, Y) =>
-  getFeaturesToSplitOn(X).reduce((acc, {value, index}) => {
+  getFeaturesToSplitOn(X).reduce((best, {value, index}) => {
     let fn = ([x, y]) => x[index] >= value;
-    let partitions = partition(fn, pack(X, Y));
+    let partitions = map(partition(fn, pack(X, Y)), (part) => unpack(part));
+
     let gain = informationGain(score, partitions);
 
-    if (!acc.gain || gain > acc.gain) {
-      acc = { gain, partitions, index, value, fn }; // jshint ignore:line
-    }
+    if (!best.gain || gain > best.gain)
+      assign(best, { gain, partitions, index, value, fn });
 
-    return acc;
+    return best;
   }, {});
 
 
