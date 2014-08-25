@@ -17,7 +17,6 @@ const getData = () => {
 const data = getData();
 const labels = uniq(data.map(([x, y]) => y));
 
-
 // partition into test && training sets
 var sets = partition(() => Math.random() > 0.25, data);
 var [trainX, trainY] = unpack(sets[true]);

@@ -57,4 +57,3 @@ const map = (obj, fn) =>
     acc[key] = fn(obj[key], key);
     return acc;
   }, {});
-
