@@ -64,4 +64,53 @@ describe('Utils', function() {
     assert(spy.getCall(2).calledWith([3,4]));
     assert(spy.getCall(3).calledWith([]));
   });
+
+  it('can find the percentage a value is of an array', function() {
+    var perc = utils.perc;
+    assert.equal(0.5, perc('a', ['a', 333]));
+    assert.equal(0.25, perc('a', ['a', 'b', 'b', 'b']));
+    assert.equal(1, perc(1, [1, 1]));
+    assert.equal(0, perc('a', [1]));
+  });
+
+  it('can return the max value of an array', function() {
+    var max = utils.max;
+    assert.equal(10, max([1, 2, 3, 10]));
+    assert.equal(10, max([10, 2, 3, 1]));
+  });
+
+  it('can return the values of an object', function() {
+    var values = utils.values;
+    var obj = { a: 123, b: 456, c: 'c' };
+    assert.deepEqual([123, 456, 'c'], values(obj));
+    assert.deepEqual([], values({}));
+  });
+
+  it('can map over an object', function() {
+    var map = utils.map;
+    var spy = sinon.spy(function(n) { return n; });
+    var obj = { a: 1, b: 2, c: 3 };
+    assert.deepEqual(obj, map(obj, spy));
+    assert.equal(spy.callCount, 3);
+    assert(spy.getCall(0).calledWith(1));
+    assert(spy.getCall(1).calledWith(2));
+    assert(spy.getCall(2).calledWith(3));
+  });
+
+  it('can sample an array', function() {
+    var sample = utils.sample;
+    var arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    assert.equal(10, sample(arr, 1.0).length);
+    assert.equal(5, sample(arr, 0.5).length);
+    assert.equal(3, sample(arr, 0.33333).length);
+    sample(arr, 0.5).forEach(function(i) {
+      assert.notEqual(-1, arr.indexOf(arr[i]));
+    });
+
+    var noReplacement = sample(arr, 1.0, false);
+    noReplacement.forEach(function(i) {
+      assert(0 <= i && i < arr.length);
+    });
+  });
+
 });

@@ -2,7 +2,7 @@
 
 export { 
   uniq, transpose, partition, freqs, entropy, pack, unpack, max, flatten, 
-  flatMap, values, perc, map
+  flatMap, values, perc, map, sample
 };
 
 const uniq = (arr) =>
@@ -56,3 +56,18 @@ const map = (obj, fn) =>
     acc[key] = fn(obj[key], key);
     return acc;
   }, {});
+
+const sample = (arr, perc = 0.75, replacement = true) => {
+  let rand = () => Math.floor(Math.random() * arr.length);
+  let empty = Array(...Array(Math.floor(arr.length * perc)));
+
+  // return indicies only!
+  return empty.reduce(acc => {
+    let i = rand();
+
+    if (!replacement)
+      while (!acc.indexOf(i)) i = rand();
+
+    return [...acc, i];
+  }, [])
+};
