@@ -8,5 +8,5 @@ traceur.require.makeDefault(function(filename) {
 module.exports = {
   utils: require('./src/utils'),
   CART: require('./src/cart'),
-  randomJungle: require('./src/random_jungle')
+  RandomJungle: require('./src/random_jungle')
 };

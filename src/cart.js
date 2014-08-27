@@ -14,11 +14,12 @@ const create = (X, Y, labels) => {
 
   if (score > 0) {
     let {gain, partitions, value, i, fn} = getBestSplit(score, X, Y);
-    let trees = map(partitions, ([x, y]) => create(x, y, labels));
-    return { score, trees, fn };
-  } else {
-    return { probs: probabilities(Y, labels) };
+    if (values(partitions).length > 1) {
+      let trees = map(partitions, ([x, y]) => create(x, y, labels));
+      return { score, trees, fn };
+    }
   }
+  return { probs: probabilities(Y, labels) };
 };
 
 // Traverse the tree until we are at a leaf (has probabilities).

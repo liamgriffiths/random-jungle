@@ -113,4 +113,11 @@ describe('Utils', function() {
     });
   });
 
+  it('can create an empty array of a specified length', function() {
+    var empty = utils.empty;
+    assert.equal(10, empty(10).length);
+    assert.equal(0, empty(0).length);
+    assert.deepEqual([undefined, undefined, undefined], empty(3));
+  });
+
 });

@@ -15,6 +15,9 @@ jshint: deps
 test: deps
 	@$(bin)/mocha --check-leaks -R spec --recursive $(tests)
 
+demo: deps
+	@node ./examples
+
 clean:
 	@rm -rf ./node_modules
 
