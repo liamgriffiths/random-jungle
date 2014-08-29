@@ -5,7 +5,10 @@ import {
   flatten
 } from './utils';
 
-export { create, predict };
+export { 
+  create, predict, informationGain, probabilities, getFeaturesToSplitOn,
+  getBestSplit
+};
 
 // Create a decision tree by recursively splitting on the feature value of each
 // set of examples which results in the most information gain.
