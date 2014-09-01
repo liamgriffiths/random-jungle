@@ -75,24 +75,58 @@ describe('CART', function() {
     });
   });
 
-  // describe('create', function() {
-  //   it('returns an tree object', function() {
-  //   });
-  //
-  //   it('leaf nodes should contain probabilities', function() {
-  //   });
-  //
-  //   it('non-leaf nodes should contain a `trees` property', function() {
-  //   });
-  // });
+  describe('create', function() {
+    var create = CART.create;
+    var X = [
+      [1, 1, 1],
+      [1, 1, 1],
+      [1, 1, 5]
+    ];
+    var Y = [1, 1, 0];
+    var labels = [1, 0];
 
-  // describe('predict', function() {
-  //   it('returns the correct result', function() {
-  //   });
-  //
-  //   it('returns a list of probabilities', function() {
-  //   });
-  // });
+    it('returns an tree object', function() {
+      var tree = create(X, Y, labels);
+      assert.deepEqual(Object.keys(tree), ['score', 'trees', 'value', 'i']);
+      assert.deepEqual(Object.keys(tree.trees), ['false', 'true']);
+    });
+
+    it('leaf nodes should contain probabilities', function() {
+      // create a shallow tree where all the next nodes are leaf nodes
+      var tree = create(X, Y, labels);
+      assert(tree.trees[true].probs);
+      assert(tree.trees[false].probs);
+    });
+
+    it('non-leaf nodes should contain a `trees` property', function() {
+      var tree = create(X, Y, labels);
+      assert(!tree.probs);
+    });
+  });
+
+  describe('predict', function() {
+    var create = CART.create;
+    var predict = CART.predict;
+    var X = [
+      [1, 1, 1],
+      [1, 1, 1],
+      [1, 1, 5]
+    ];
+    var Y = [1, 1, 0];
+    var labels = [1, 0];
+    var tree = create(X, Y, labels);
+
+    it('returns the correct result', function() {
+      assert.deepEqual(predict(tree, X[0]), [1, 0]);
+      assert.deepEqual(predict(tree, X[1]), [1, 0]);
+      assert.deepEqual(predict(tree, X[2]), [0, 1]);
+    });
+
+    it('returns a list of probabilities', function() {
+      assert(predict(tree, [5, 5, 5]) instanceof Array)
+      assert.equal(predict(tree, [5, 5, 5]).length, labels.length);
+    });
+  });
 });
 
 
