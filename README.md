@@ -16,9 +16,11 @@ Little [Random Forest](https://en.wikipedia.org/wiki/Random_forest) implementati
 * [ ] task to build distribution version
 * [ ] api documentation
 
-# demo, tests
-
+# install, tests, demo
 ```
+# install
+$ npm install random-jungle
+
 # run tests
 $ make test
 
