@@ -7,7 +7,7 @@ import {
 
 export {
   create, predict, informationGain, probabilities, getFeaturesToSplitOn,
-  getBestSplit
+  getBestSplit, sampleFeatures
 };
 
 // Create a decision tree by recursively splitting on the feature value of each
@@ -40,7 +40,7 @@ const probabilities = (Y, labels) =>
   labels.map(label => perc(label, Y));
 
 const sampleFeatures = (X, opts = { percent: 0.75, replacement: false }) => {
-  let featureIndicies = sample(X[0], 0.75, false);
+  let featureIndicies = sample(X[0], opts.percent, opts.replacement);
   return X.map(x => x.filter((_, i) => featureIndicies.indexOf(i) > -1));
 };
 

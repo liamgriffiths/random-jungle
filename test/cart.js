@@ -9,7 +9,7 @@ describe('CART', function() {
   describe('getFeaturesToSplitOn', function() {
     var getFeaturesToSplitOn = CART.getFeaturesToSplitOn;
 
-    it('it returns only unique feature values per feature', function() {
+    it('returns only unique feature values per feature', function() {
       var matrix = [
         [1, 2, 3],
         [1, 2, 4],
@@ -125,6 +125,27 @@ describe('CART', function() {
     it('returns a list of probabilities', function() {
       assert(predict(tree, [5, 5, 5]) instanceof Array)
       assert.equal(predict(tree, [5, 5, 5]).length, labels.length);
+    });
+  });
+
+  describe('sampleFeatures', function() {
+    var sampleFeatures = CART.sampleFeatures;
+    var X = [
+      [1, 1, 1, 1],
+      [2, 2, 2, 2],
+      [3, 3, 3, 3]
+    ];
+
+    it('can return a subspace sample of features', function() {
+      var sample = sampleFeatures(X, { percent: 0.5, replacement: false });
+      sample.forEach(function(row) {
+        assert.equal(row.length, 2);
+      });
+
+      var sample2 = sampleFeatures(X, { percent: 0.25, replacement: false });
+      sample2.forEach(function(row) {
+        assert.equal(row.length, 1);
+      });
     });
   });
 });
