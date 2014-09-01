@@ -12,7 +12,7 @@ export {
 
 // Create a decision tree by recursively splitting on the feature value of each
 // set of examples which results in the most information gain.
-const create = (X, Y, labels, opts = { randomSubspace: false }) => {
+const create = (X, Y, labels, opts = { useRandomSubspace: false }) => {
   let score = entropy(Y);
 
   if (score > 0) {
@@ -45,8 +45,8 @@ const sampleFeatures = (X, opts = { percent: 0.75, replacement: false }) => {
 };
 
 // For a feature matrix, return an array of unique feature values for each col.
-const getFeaturesToSplitOn = (X, opts = { randomSubspace: false }) => {
-  let features = opts.randomSubspace ? sampleFeatures(X) : X;
+const getFeaturesToSplitOn = (X, opts = { useRandomSubspace: false }) => {
+  let features = opts.useRandomSubspace ? sampleFeatures(X) : X;
 
   return flatMap(transpose(features), (row, i) => {
     return uniq(row).map(value => ({ value, i }));
@@ -55,7 +55,7 @@ const getFeaturesToSplitOn = (X, opts = { randomSubspace: false }) => {
 
 // Find the best partition by trying all possible partitions and keeping track
 // of the one with the greated 'information gain' (less entropy post-partition).
-const getBestSplit = (score, X, Y, opts = { randomSubspace: false }) =>
+const getBestSplit = (score, X, Y, opts = { useRandomSubspace: false }) =>
   getFeaturesToSplitOn(X, opts).reduce((best, { value, i }) => {
     let fn = ([x, y]) => x[i] >= value;
     let partitions = map(partition(fn, pack(X, Y)), part => unpack(part));

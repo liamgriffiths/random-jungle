@@ -11,8 +11,8 @@ const create = (X, Y, labels, opts = { size: 5 }) =>
   empty(opts.size).map((_, i) => {
     // Sample the training date for this tree
     let indicies = sample(Y, 1);
-    let [xs, ys] = [indicies.map(i => X[i]), indicies.map(i => Y[i])];
-    return CART.create(xs, ys, labels, { useRandomSubspace: true });
+    let [Xs, Ys] = [indicies.map(i => X[i]), indicies.map(i => Y[i])];
+    return CART.create(X, Y, labels, { useRandomSubspace: true });
   });
 
 // Aggregate the output from all the decision trees in the jungle.
