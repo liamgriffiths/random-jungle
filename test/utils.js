@@ -11,6 +11,10 @@ describe('Utils', function() {
     assert.deepEqual(uniq(['a', 'b', 'c', 'c']), ['a', 'b', 'c']);
     assert.deepEqual(uniq([]), []);
     assert.deepEqual(uniq([1]), [1]);
+
+    var o = {};
+    var fn = function(){};
+    assert.deepEqual(uniq([o, fn, o, fn]), [o, fn]);
   });
 
   it('can transpose a matrix', function() {
