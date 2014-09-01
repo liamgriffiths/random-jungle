@@ -16,7 +16,7 @@ const create = (X, Y, labels, opts = { randomSubspace: false }) => {
   let score = entropy(Y);
 
   if (score > 0) {
-    let {gain, partitions, value, i, fn} = getBestSplit(score, X, Y, opts);
+    let {partitions, value, i} = getBestSplit(score, X, Y, opts);
     let trees = map(partitions, ([x, y]) => create(x, y, labels));
     return { score, trees, value, i };
   }
@@ -28,7 +28,7 @@ const create = (X, Y, labels, opts = { randomSubspace: false }) => {
 const predict = (tree, x) => {
   let fn = ([x, y]) => x[tree.i] >= tree.value;
   return tree.probs || predict(tree.trees[fn([x])], x);
-}
+};
 
 // Return the difference between the score (previous entropy) and the sum of the
 // weighted entropy of a set of partitions.

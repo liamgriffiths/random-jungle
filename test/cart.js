@@ -1,7 +1,6 @@
 'use strict';
 
 var assert = require('assert');
-var sinon = require('sinon');
 var CART = require('..').CART;
 var utils = require('..').utils;
 
@@ -123,7 +122,7 @@ describe('CART', function() {
     });
 
     it('returns a list of probabilities', function() {
-      assert(predict(tree, [5, 5, 5]) instanceof Array)
+      assert(predict(tree, [5, 5, 5]) instanceof Array);
       assert.equal(predict(tree, [5, 5, 5]).length, labels.length);
     });
   });

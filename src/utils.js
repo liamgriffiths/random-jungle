@@ -72,12 +72,12 @@ const map = (obj, fn) =>
 
 // Return an empty array of a given size.
 const empty = (size) =>
-  Array(...Array(size));
+  new Array(...new Array(size));
 
 // Return an array of indicies sampled from a given array.
-const sample = (arr, perc = 0.75, replacement = true) => {
+const sample = (arr, percent = 0.75, replacement = true) => {
   let rand = () => Math.floor(Math.random() * arr.length);
-  let arr = empty(Math.floor(arr.length * perc));
+  arr = empty(Math.floor(arr.length * percent));
 
   // return indicies only!
   return arr.reduce(acc => {
