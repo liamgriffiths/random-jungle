@@ -6,7 +6,7 @@ Little [Random Forest](https://en.wikipedia.org/wiki/Random_forest) implementati
 
 ## todo list
 
-* [ ] tests for CART
+* [x] tests for CART
 * [ ] tests for random jungle
 * [ ] regression support for CART, random jungle
 * [ ] extract data formatting functions into utils.js
