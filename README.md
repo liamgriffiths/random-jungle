@@ -24,7 +24,7 @@ $ npm install random-jungle
 # run tests
 $ make test
 
-# run demo
+# run demo (classify irises)
 $ make demo
 ```
 
