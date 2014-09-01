@@ -27,7 +27,7 @@ describe('CART', function() {
     it('return probabilities for outcomes and possible outcomes', function() {
       var outcomes = [1, 1, 1, 1, 2, 2, 2, 3];
       var possible = [1, 2, 3, 4];
-      
+
       var probs = probabilities(outcomes, possible);
       assert.equal(possible.length, probs.length);
       assert.deepEqual([4/8, 3/8, 1/8, 0/8], probs);
@@ -51,18 +51,34 @@ describe('CART', function() {
     });
   });
 
-  // describe('getBestSplit', function() {
-  //   it('returns an object containing partitions, and split values', function() {
-  //   });
-  //
-  //   it('retuns partitions which result in the most info gain', function() {
-  //   });
-  // });
+  describe('getBestSplit', function() {
+    var getBestSplit = CART.getBestSplit;
+    var score = 1;
+    var X = [
+      [1, 1, 1],
+      [1, 1, 1],
+      [1, 1, 5], // 5 is the only value here that could identify this row
+    ];
+    var Y = [1, 1, 0];
+
+    it('returns an object containing partitions, and split values', function() {
+      var best = getBestSplit(score, X, Y);
+      assert.deepEqual(['gain', 'partitions', 'value', 'i'], Object.keys(best));
+    });
+
+    it('retuns partitions which result in the most info gain', function() {
+      var best = getBestSplit(score, X, Y);
+      assert.equal(best.value, 5);
+      assert.equal(best.i, 2);
+      assert.deepEqual(best.partitions[true], [[[1,1,5]], [0]]);
+      assert.deepEqual(best.partitions[false], [[[1,1,1], [1,1,1]], [1,1]]);
+    });
+  });
 
   // describe('create', function() {
   //   it('returns an tree object', function() {
   //   });
-  //   
+  //
   //   it('leaf nodes should contain probabilities', function() {
   //   });
   //
