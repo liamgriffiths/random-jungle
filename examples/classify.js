@@ -26,7 +26,7 @@ const demoCART = (trainX, trainY, testSet) => {
 };
 
 const demoRandomJungle = (trainX, trainY, testSet) => {
-  var jungle = RandomJungle.create(trainX, trainY, labels,  { size: 5 });
+  var jungle = RandomJungle.create(trainX, trainY, labels,  { size: 15 });
   var [correct, incorrect] = [0, 0];
   testSet.forEach(function([x, y]) {
     let out = RandomJungle.predict(jungle, x);
@@ -46,7 +46,7 @@ const print = (name, correct, incorrect, trainingSet, testSet, source) => {
   log('Correct: %d vs. Incorrect: %d', correct, incorrect);
   log('Percentage classified correctly: %d', correct / (correct + incorrect));
   log('- - - - - - - - - - - - - - - - - - - - - - - - - - - - -');
-  // log('\n');
+  log('\n');
   // log('Model source:\n');
   // log(JSON.stringify(source));
   // log('- - - - - - - - - - - - - - - - - - - - - - - - - - - - -');
@@ -60,6 +60,5 @@ var sets = partition(() => Math.random() > 0.25, data);
 var [trainX, trainY] = unpack(sets[true]);
 var testSet = sets[false];
 print('CART decision tree', ...demoCART(trainX, trainY, testSet));
-console.log('\n');
 print('Random Jungle', ...demoRandomJungle(trainX, trainY, testSet));
 
