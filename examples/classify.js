@@ -2,7 +2,6 @@ const CART = require('..').CART;
 const RandomJungle = require('..').RandomJungle;
 const { partition, pack, unpack, uniq, max } = require('..').utils;
 const fs = require('fs');
-const log = console.log;
 
 // grab data from file
 const parseCSV = (contents) =>
@@ -27,7 +26,7 @@ const demoCART = (trainX, trainY, testSet) => {
 };
 
 const demoRandomJungle = (trainX, trainY, testSet) => {
-  var jungle = RandomJungle.create(trainX, trainY, labels, 30);
+  var jungle = RandomJungle.create(trainX, trainY, labels,  { size: 5 });
   var [correct, incorrect] = [0, 0];
   testSet.forEach(function([x, y]) {
     let out = RandomJungle.predict(jungle, x);
@@ -38,6 +37,7 @@ const demoRandomJungle = (trainX, trainY, testSet) => {
 };
 
 const print = (name, correct, incorrect, trainingSet, testSet, source) => {
+  let log = console.log;
   log('- - - - - - - - - - - - - - - - - - - - - - - - - - - - -');
   log('Classifying Iris data using: %s', name);
   log('- - - - - - - - - - - - - - - - - - - - - - - - - - - - -');
@@ -46,6 +46,7 @@ const print = (name, correct, incorrect, trainingSet, testSet, source) => {
   log('Correct: %d vs. Incorrect: %d', correct, incorrect);
   log('Percentage classified correctly: %d', correct / (correct + incorrect));
   log('- - - - - - - - - - - - - - - - - - - - - - - - - - - - -');
+  // log('\n');
   // log('Model source:\n');
   // log(JSON.stringify(source));
   // log('- - - - - - - - - - - - - - - - - - - - - - - - - - - - -');
@@ -59,7 +60,6 @@ var sets = partition(() => Math.random() > 0.25, data);
 var [trainX, trainY] = unpack(sets[true]);
 var testSet = sets[false];
 print('CART decision tree', ...demoCART(trainX, trainY, testSet));
-log('\n');
+console.log('\n');
 print('Random Jungle', ...demoRandomJungle(trainX, trainY, testSet));
-log('\n');
 

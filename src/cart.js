@@ -2,27 +2,26 @@
 
 import {
   uniq, entropy, perc, transpose, partition, pack, unpack, flatMap, values, map,
-  flatten
+  flatten, sample
 } from './utils';
 
-export { 
+export {
   create, predict, informationGain, probabilities, getFeaturesToSplitOn,
   getBestSplit
 };
 
 // Create a decision tree by recursively splitting on the feature value of each
 // set of examples which results in the most information gain.
-const create = (X, Y, labels) => {
+const create = (X, Y, labels, opts = {}) => {
   let score = entropy(Y);
 
   if (score > 0) {
-    let {gain, partitions, value, i, fn} = getBestSplit(score, X, Y);
-    if (values(partitions).length > 1) {
-      let trees = map(partitions, ([x, y]) => create(x, y, labels));
-      return { score, trees, fn };
-    }
+    let {gain, partitions, value, i, fn} = getBestSplit(score, X, Y, opts);
+    let trees = map(partitions, ([x, y]) => create(x, y, labels));
+    return { score, trees, fn };
   }
-  return { probs: probabilities(Y, labels) };
+
+  return { score, probs: probabilities(Y, labels) };
 };
 
 // Traverse the tree until we are at a leaf (has probabilities).
@@ -39,13 +38,24 @@ const probabilities = (Y, labels) =>
   labels.map(label => perc(label, Y));
 
 // For a feature matrix, return an array of unique feature values for each col.
-const getFeaturesToSplitOn = (X) =>
-  flatMap(transpose(X), (row, i) => uniq(row).map(value => ({ value, i })));
+const getFeaturesToSplitOn = (X, opts = {}) => {
+  if (opts.randomSubspace) {
+    let featureIndicies = sample(X[0], 0.75, false);
+    let Xs = X.map(x => x.filter((_, i) => featureIndicies.indexOf(i) > -1));
+    return flatMap(transpose(Xs), (row, i) =>
+      uniq(row).map(value => ({ value, i }))
+    );
+  } else {
+    return flatMap(transpose(X), (row, i) =>
+      uniq(row).map(value => ({ value, i }))
+    );
+  }
+}
 
 // Find the best partition by trying all possible partitions and keeping track
 // of the one with the greated 'information gain' (less entropy post-partition).
-const getBestSplit = (score, X, Y) =>
-  getFeaturesToSplitOn(X).reduce((best, { value, i }) => {
+const getBestSplit = (score, X, Y, opts = {}) =>
+  getFeaturesToSplitOn(X, opts).reduce((best, { value, i }) => {
     let fn = ([x, y]) => x[i] >= value;
     let partitions = map(partition(fn, pack(X, Y)), part => unpack(part));
     let gain = informationGain(score, Y.length, ...values(partitions));
