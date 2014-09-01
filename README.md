@@ -28,9 +28,13 @@ $ make demo
 
 # notes
 
-Attempting to write this in a very functional style, using strict jshint linting, and generally following [this mozilla ES6 style guide](https://github.com/mozilla/addon-sdk/wiki/Coding-style-guide).
+Attempting to write this in a very functional style, using strict jshint
+linting, and generally following [this mozilla ES6 style
+guide](https://github.com/mozilla/addon-sdk/wiki/Coding-style-guide).
 
-Currently using the [Google Traceur Compiler](https://github.com/google/traceur-compiler) for transpiling ES6 JavaScript.
+Currently using the [Google Traceur
+Compiler](https://github.com/google/traceur-compiler) for transpiling ES6
+JavaScript.
 
 # license
 
