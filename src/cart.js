@@ -18,7 +18,7 @@ const create = (X, Y, labels, opts = { randomSubspace: false }) => {
   if (score > 0) {
     let {gain, partitions, value, i, fn} = getBestSplit(score, X, Y, opts);
     let trees = map(partitions, ([x, y]) => create(x, y, labels));
-    return { score, trees, fn, value, i };
+    return { score, trees, value, i };
   }
 
   return { score, probs: probabilities(Y, labels) };
@@ -62,7 +62,7 @@ const getBestSplit = (score, X, Y, opts = { randomSubspace: false }) =>
     let gain = informationGain(score, Y.length, ...values(partitions));
 
     if (!best.gain || gain > best.gain)
-      Object.assign(best, { gain, partitions, value, i, fn });
+      Object.assign(best, { gain, partitions, value, i });
 
     return best;
   }, {});
